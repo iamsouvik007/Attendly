@@ -2,36 +2,67 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-<p class="brand-mini">ATTENDLY</p>
-<h2>Create Account</h2>
-<p class="subtitle">Simple setup for fast attendance management.</p>
+<div class="auth-header">
+    <p class="brand-mini">Attendly</p>
+    <h2>Create account</h2>
+    <p class="subtitle">Quick setup for fast attendance management.</p>
+</div>
 
 <form method="post">
     {% csrf_token %}
 
     {{ form.non_field_errors }}
 
-    <label>Email</label>
-    {{ form.email }}
-    {{ form.email.errors }}
+    <div class="input-group">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M22 7l-10 7L2 7"/>
+        </svg>
+        <label>Email</label>
+        {{ form.email }}
+        {{ form.email.errors }}
+    </div>
 
-    <label>First Name</label>
-    {{ form.first_name }}
-    {{ form.first_name.errors }}
+    <div class="input-group">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <label>First Name</label>
+        {{ form.first_name }}
+        {{ form.first_name.errors }}
+    </div>
 
-    <label>Last Name</label>
-    {{ form.last_name }}
-    {{ form.last_name.errors }}
+    <div class="input-group">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <label>Last Name</label>
+        {{ form.last_name }}
+        {{ form.last_name.errors }}
+    </div>
 
-    <label>Password</label>
-    {{ form.password1 }}
-    {{ form.password1.errors }}
+    <div class="input-group">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <label>Password</label>
+        {{ form.password1 }}
+        {{ form.password1.errors }}
+    </div>
 
-    <label>Confirm Password</label>
-    {{ form.password2 }}
-    {{ form.password2.errors }}
+    <div class="input-group">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <label>Confirm Password</label>
+        {{ form.password2 }}
+        {{ form.password2.errors }}
+    </div>
 
-    <button type="submit">Register</button>
+    <button type="submit" class="btn">Create Account</button>
 </form>
 
 {% if google_login_enabled %}
@@ -39,14 +70,22 @@
 <div class="divider">or</div>
 <form action="{% provider_login_url 'google' %}" method="post">
     {% csrf_token %}
-    <button type="submit" class="google-btn">Sign up with Google</button>
+    <button type="submit" class="google-btn">
+        <svg class="google-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.9-5.5 3.9-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.2.8 3.9 1.5l2.6-2.5C16.8 3.6 14.6 2.7 12 2.7 6.9 2.7 2.8 6.8 2.8 12S6.9 21.3 12 21.3c6.9 0 8.6-4.8 8.6-7.3 0-.5 0-.9-.1-1.3H12z"/>
+            <path fill="#34A853" d="M2.8 7.4l3.2 2.3C6.8 8.1 9.2 6.3 12 6.3c1.9 0 3.2.8 3.9 1.5l2.6-2.5C16.8 3.6 14.6 2.7 12 2.7 8.1 2.7 4.8 4.9 2.8 7.4z"/>
+            <path fill="#FBBC05" d="M12 21.3c2.5 0 4.7-.8 6.2-2.3l-2.9-2.3c-.8.6-1.8 1.1-3.3 1.1-3.8 0-5.3-2.5-5.5-3.8L3.2 16c2 3.6 5.3 5.3 8.8 5.3z"/>
+            <path fill="#4285F4" d="M20.6 12.7c0-.5 0-.9-.1-1.3H12v3.9h5.5c-.3 1.4-1.2 2.5-2.3 3.2l2.9 2.3c1.7-1.5 2.5-3.8 2.5-6.1z"/>
+        </svg>
+        <span>Sign up with Google</span>
+    </button>
 </form>
 {% else %}
-<p class="muted">Google signup is not configured yet. Add credentials in env or Django SocialApp.</p>
+<p class="muted-note">Google signup is not configured yet.</p>
 {% endif %}
 
-<div class="link">
+<div class="auth-link">
     <p>Already have an account?</p>
-    <a href="{% url 'accounts:login' %}">Login</a>
+    <a href="{% url 'accounts:login' %}">Sign in</a>
 </div>
 {% endblock %}

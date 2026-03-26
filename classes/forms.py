@@ -11,4 +11,8 @@ class ClassForm(forms.ModelForm):
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ['first_name', 'last_name', 'student_id', 'email']
+        fields = ['first_name', 'last_name', 'student_id', 'phone']
+        labels = {
+            'student_id': 'Roll No',
+            'phone': 'Phone No',
+        }

@@ -12,7 +12,7 @@ class ClassAdmin(admin.ModelAdmin):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'student_id', 'email']
+    list_display = ['first_name', 'last_name', 'student_id', 'phone']
     search_fields = ['student_id', 'first_name', 'last_name']
 
 

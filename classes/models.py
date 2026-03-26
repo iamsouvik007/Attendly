@@ -27,7 +27,7 @@ class Student(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     student_id = models.CharField(max_length=20, unique=True)  # roll number
-    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -40,12 +40,15 @@ class Enrollment(models.Model):
     A student can be enrolled in many classes.
     A class can have many students.
     """
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='enrollments')
-    class_enrolled = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='enrollments')
+    student = models.ForeignKey(
+        Student, on_delete=models.CASCADE, related_name='enrollments')
+    class_enrolled = models.ForeignKey(
+        Class, on_delete=models.CASCADE, related_name='enrollments')
     enrolled_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ['student', 'class_enrolled']  # no duplicate enrollments
+        # no duplicate enrollments
+        unique_together = ['student', 'class_enrolled']
 
     def __str__(self):
         return f"{self.student} → {self.class_enrolled}"

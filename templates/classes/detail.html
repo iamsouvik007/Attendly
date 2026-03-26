@@ -20,9 +20,9 @@
     <table>
         <thead>
             <tr>
-                <th>Student ID</th>
+                <th>Roll No</th>
                 <th>Name</th>
-                <th>Email</th>
+                <th>Phone</th>
                 <th>Enrolled</th>
                 <th>Report</th>
             </tr>
@@ -32,7 +32,7 @@
             <tr>
                 <td>{{ enrollment.student.student_id }}</td>
                 <td>{{ enrollment.student.first_name }} {{ enrollment.student.last_name }}</td>
-                <td>{{ enrollment.student.email|default:'-' }}</td>
+                <td>{{ enrollment.student.phone|default:'-' }}</td>
                 <td>{{ enrollment.enrolled_at|date:'Y-m-d' }}</td>
                 <td>
                     <a class="btn btn-outline" href="{% url 'reports:student_report' enrollment.student.pk %}">Student Report</a>

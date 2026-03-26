@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,245 +7,46 @@
     <title>Attendly | {% block title %}{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --bg: #f4efe6;
-            --card: #fffdf8;
-            --ink: #1e293b;
-            --muted: #6b7280;
-            --accent: #0f766e;
-            --accent-strong: #115e59;
-            --danger: #b42318;
-            --ring: rgba(15, 118, 110, 0.18);
-            --border: #d6d3d1;
-        }
-
-        body.dark {
-            --bg: #0b1220;
-            --card: #111a2c;
-            --ink: #dbe5f7;
-            --muted: #9fb1cc;
-            --accent: #22c55e;
-            --accent-strong: #16a34a;
-            --danger: #f87171;
-            --ring: rgba(34, 197, 94, 0.2);
-            --border: #26354f;
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: "Manrope", "Segoe UI", "Trebuchet MS", sans-serif;
-            color: var(--ink);
-            background:
-                radial-gradient(circle at 20% 20%, #fce7c8 0, transparent 30%),
-                radial-gradient(circle at 80% 0%, #c9efe8 0, transparent 32%),
-                var(--bg);
-            display: grid;
-            place-items: center;
-            padding: 24px;
-            line-height: 1.45;
-        }
-
-        .card {
-            width: min(100%, 430px);
-            background: var(--card);
-            padding: 30px;
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
-            animation: rise 260ms ease-out;
-        }
-
-        .brand-mini {
-            text-align: center;
-            font-weight: 800;
-            letter-spacing: 0.8px;
-            color: var(--accent);
-            margin: 0 0 12px;
-        }
-
-        .theme-toggle {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            width: auto;
-            margin-top: 0;
-            padding: 8px 12px;
-            border-radius: 999px;
-            font-size: 0.88rem;
-            background: rgba(15, 23, 42, 0.78);
-            border: 1px solid rgba(148, 163, 184, 0.3);
-            color: #e2e8f0;
-        }
-
-        body.dark .theme-toggle {
-            background: rgba(226, 232, 240, 0.14);
-            color: #e2e8f0;
-        }
-
-        @keyframes rise {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2 {
-            margin: 0 0 18px;
-            text-align: center;
-            letter-spacing: 0.2px;
-        }
-
-        .subtitle {
-            margin: -10px 0 16px;
-            text-align: center;
-            color: var(--muted);
-            font-size: 0.92rem;
-        }
-
-        label {
-            display: block;
-            margin: 10px 0 6px;
-            font-size: 0.92rem;
-            color: var(--muted);
-        }
-
-        input {
-            width: 100%;
-            padding: 11px 12px;
-            margin: 0 0 10px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: #fff;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px var(--ring);
-        }
-
-        button {
-            width: 100%;
-            margin-top: 8px;
-            padding: 11px 12px;
-            background: linear-gradient(135deg, var(--accent), #0ea5a2);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: transform 140ms ease, filter 140ms ease;
-        }
-
-        button:hover {
-            filter: brightness(1.03);
-            transform: translateY(-1px);
-        }
-
-        .google-btn {
-            margin-top: 10px;
-            background: #ea4335;
-        }
-
-        .google-btn:hover { background: #c0392b; }
-
-        .link {
-            text-align: center;
-            margin-top: 16px;
-            font-size: 0.95rem;
-        }
-
-        .link p { margin: 0 0 4px; color: var(--muted); }
-        .link a { color: var(--accent); text-decoration: none; font-weight: 600; }
-
-        .messages {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 12px;
-        }
-
-        .messages li {
-            background: #ecfdf5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-            border-radius: 10px;
-            padding: 10px;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-        }
-
-        .errorlist,
-        .error {
-            margin: 0 0 8px;
-            color: var(--danger);
-            font-size: 0.88rem;
-            padding-left: 18px;
-        }
-
-        .muted {
-            color: var(--muted);
-            font-size: 0.88rem;
-            margin-top: 8px;
-            text-align: center;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--muted);
-            margin: 10px 0 2px;
-            font-size: 0.84rem;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: "";
-            flex: 1;
-            border-top: 1px solid var(--border);
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
 <body>
-<button id="theme-toggle" class="theme-toggle" type="button">Dark mode</button>
 
-<div class="card">
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% block content %}{% endblock %}
+<div class="auth-wrapper">
+    <!-- Left: Brand Panel -->
+    <div class="auth-brand-panel">
+        <div class="auth-brand-name">Attendly</div>
+        <p class="auth-brand-tagline">Smart attendance tracking for modern educators. Simple, fast, reliable.</p>
+        <div class="auth-decorations">
+            <div class="auth-deco-card">
+                <span class="deco-number">✓</span>
+                <span class="deco-label">Quick Setup</span>
+            </div>
+            <div class="auth-deco-card">
+                <span class="deco-number">📊</span>
+                <span class="deco-label">Live Reports</span>
+            </div>
+            <div class="auth-deco-card">
+                <span class="deco-number">🎯</span>
+                <span class="deco-label">Track Easily</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Form Panel -->
+    <div class="auth-form-panel">
+        <div class="auth-card">
+            {% if messages %}
+            <ul class="auth-messages">
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
 </div>
-
-<script>
-    (function() {
-        var key = 'attendly-theme';
-        var button = document.getElementById('theme-toggle');
-        var saved = localStorage.getItem(key);
-        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        var isDark = saved ? saved === 'dark' : prefersDark;
-
-        function setTheme(dark) {
-            document.body.classList.toggle('dark', dark);
-            button.textContent = dark ? 'Light mode' : 'Dark mode';
-        }
-
-        setTheme(isDark);
-
-        button.addEventListener('click', function() {
-            isDark = !document.body.classList.contains('dark');
-            setTheme(isDark);
-            localStorage.setItem(key, isDark ? 'dark' : 'light');
-        });
-    })();
-</script>
 
 </body>
 </html>
