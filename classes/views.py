@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.core.cache import cache
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic import ListView
@@ -86,4 +87,55 @@ class AddStudentView(LoginRequiredMixin, View):
         Enrollment.objects.create(student=student, class_enrolled=cls)
         self._invalidate_related_cache(request.user.pk, cls.pk, student.pk)
         messages.success(request, f'{student} added.')
+        return redirect('classes:detail', pk=pk)
+
+
+class DeleteClassView(LoginRequiredMixin, View):
+
+    def post(self, request, pk):
+        cls = get_object_or_404(Class, pk=pk, teacher=request.user)
+
+        student_ids = list(
+            cls.enrollments.values_list('student_id', flat=True)
+        )
+
+        with transaction.atomic():
+            cls.delete()
+
+            # Remove orphan students not enrolled in any class.
+            if student_ids:
+                Student.objects.filter(
+                    pk__in=student_ids,
+                    enrollments__isnull=True,
+                ).delete()
+
+        cache.delete(f'dashboard_stats:{request.user.pk}')
+        cache.delete(f'class_report:{request.user.pk}:{pk}')
+
+        messages.success(request, 'Class deleted successfully.')
+        return redirect('classes:list')
+
+
+class DeleteStudentView(LoginRequiredMixin, View):
+
+    def post(self, request, pk, student_pk):
+        cls = get_object_or_404(Class, pk=pk, teacher=request.user)
+        enrollment = get_object_or_404(
+            Enrollment,
+            class_enrolled=cls,
+            student_id=student_pk,
+        )
+
+        student = enrollment.student
+        enrollment.delete()
+
+        # If this student is not linked to any class, delete full student record.
+        if not Enrollment.objects.filter(student=student).exists():
+            student.delete()
+
+        cache.delete(f'dashboard_stats:{request.user.pk}')
+        cache.delete(f'class_report:{request.user.pk}:{cls.pk}')
+        cache.delete(f'student_report:{request.user.pk}:{student_pk}')
+
+        messages.success(request, 'Student deleted successfully.')
         return redirect('classes:detail', pk=pk)

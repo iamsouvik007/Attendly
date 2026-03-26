@@ -9,13 +9,59 @@
         <p class="kpi-label">Total Classes</p>
     </article>
     <article class="card">
+        <p class="kpi">{{ total_students }}</p>
+        <p class="kpi-label">Total Students</p>
+    </article>
+    <article class="card">
         <p class="kpi">{{ recent_sessions|length }}</p>
         <p class="kpi-label">Recent Sessions</p>
     </article>
-    <article class="card">
-        <p class="kpi">{{ my_classes|length }}</p>
-        <p class="kpi-label">Active Classes</p>
-    </article>
+</section>
+
+<section class="card" style="margin-top: 14px;">
+    <div class="panel-head">
+        <div>
+            <h2 class="section-title">Attendance Overview by Date</h2>
+            <p class="section-subtitle">Choose a date from calendar and see present students per class.</p>
+        </div>
+        <form method="get" class="actions" style="align-items: end;">
+            <div style="min-width: 220px;">
+                <label for="id_dashboard_date">Select Date</label>
+                <input id="id_dashboard_date" type="date" name="date" value="{{ selected_date }}">
+            </div>
+            <button class="btn" type="submit">Show</button>
+        </form>
+    </div>
+
+    {% if chart_rows %}
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Class</th>
+                <th>Present / Total</th>
+                <th>Bar Chart</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in chart_rows %}
+            <tr>
+                <td>{{ row.name }} ({{ row.code }})</td>
+                <td>{{ row.present }} / {{ row.total }}</td>
+                <td style="min-width: 260px;">
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width: {{ row.percent }}%;"></div>
+                    </div>
+                    <small class="muted">{{ row.percent }}% present</small>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <p class="muted">No classes available to build chart.</p>
+    {% endif %}
 </section>
 
 <section class="card" style="margin-top: 14px;">

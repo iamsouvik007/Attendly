@@ -1,7 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count, Q
 from django.core.cache import cache
+from django.utils import timezone
 from django.views.generic import TemplateView
-from classes.models import Class
+from classes.models import Class, Enrollment
 from attendance.models import AttendanceSession
 
 
@@ -14,11 +16,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         teacher = self.request.user
         cache_key = f'dashboard_stats:{teacher.pk}'
         cached_context = cache.get(cache_key)
+        selected_date = self.request.GET.get(
+            'date') or timezone.now().date().isoformat()
 
         if cached_context is None:
             my_classes = Class.objects.filter(teacher=teacher)
             cached_context = {
                 'total_classes': my_classes.count(),
+                'total_students': Enrollment.objects.filter(
+                    class_enrolled__teacher=teacher
+                ).values('student_id').distinct().count(),
                 'recent_sessions': list(
                     AttendanceSession.objects.filter(
                         class_ref__teacher=teacher)
@@ -30,6 +37,38 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             }
             cache.set(cache_key, cached_context, 180)
 
+        classes_for_chart = (
+            Class.objects.filter(teacher=teacher)
+            .annotate(
+                total_students=Count('enrollments__student', distinct=True),
+                present_students=Count(
+                    'sessions__records__student',
+                    filter=Q(
+                        sessions__date=selected_date,
+                        sessions__records__status='present',
+                    ),
+                    distinct=True,
+                ),
+            )
+            .values('pk', 'name', 'code', 'total_students', 'present_students')
+            .order_by('name')
+        )
+
+        chart_rows = []
+        for row in classes_for_chart:
+            total = row['total_students'] or 0
+            present = row['present_students'] or 0
+            percent = int((present / total) * 100) if total else 0
+            chart_rows.append({
+                'name': row['name'],
+                'code': row['code'],
+                'total': total,
+                'present': present,
+                'percent': percent,
+            })
+
         context.update(cached_context)
+        context['selected_date'] = selected_date
+        context['chart_rows'] = chart_rows
 
         return context
