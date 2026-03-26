@@ -1,164 +1,131 @@
-# Attendly
+# Attendly 👋
 
-Attendly is a Django-based attendance management app for teachers.
+Attendly is a Django-based attendance management platform for teachers. It helps manage classes and students, run attendance sessions, and view attendance reports from a clean dashboard.
 
-It includes:
+## Live Demo 🔗
+
+https://attendly-77r3.onrender.com
+
+## Features
+
 - Email/password authentication
-- Google login (django-allauth)
-- Class and student management
-- Attendance sessions and attendance marking
-- Class and student attendance reports
-- Caching for faster repeated reads
-- Render deployment support (PostgreSQL + Gunicorn + WhiteNoise)
+- Google sign-in using django-allauth
+- Teacher profile flow
+- Class creation and management
+- Student management with validation for unique roll number and phone
+- Attendance session start and attendance marking
+- Class-wise and student-wise attendance reports
+- Cached reads for dashboard and report pages
+- Production-ready deployment setup for Render
 
 ## Tech Stack
 
 - Python 3.11+
-- Django 5.2+
+- Django 6.0.3
+- PostgreSQL (required via DATABASE_URL)
 - django-allauth
-- PostgreSQL (production via `DATABASE_URL`)
-- SQLite (local fallback)
-- WhiteNoise (static files in production)
-- Gunicorn (production WSGI server)
+- Gunicorn
+- WhiteNoise
 
 ## Project Structure
 
-Key folders/files:
-- `accounts/` auth, registration, login
-- `classes/` classes, students, enrollment
-- `attendance/` session start and attendance marking
-- `reports/` class/student report views
-- `dashboard/` teacher dashboard
-- `config/` project settings and root urls
-- `templates/` all HTML templates (includes landing page)
-- `static/` CSS/JS assets
-- `render.yaml` Render deployment config
-- `.env.example` environment variable template
+- accounts/: authentication, registration, profile, social login integration
+- classes/: class and student models, forms, views
+- attendance/: attendance session flow and marking views
+- reports/: report views for class and student attendance
+- dashboard/: home dashboard
+- config/: project settings and root URL config
+- templates/: HTML templates for all apps
+- static/: custom CSS and JavaScript
+- render.yaml / Procfile / runtime.txt: Render deployment configuration
 
-## Features
+## Quick Start (Local)
 
-- Landing page at `/` for signed-out users
-- Dashboard redirect for signed-in users
-- Add classes and students
-- Student fields:
-  - First Name (required)
-  - Last Name (required)
-  - Roll No (required, unique)
-  - Mobile No (required, unique, minimum 10 digits, digits only)
-- Attendance record by session
-- Report pages with cached read performance
-
-## Local Setup
-
-1. Clone and open the project.
-2. Create and activate venv.
+1. Clone the repository and open it.
+2. Create and activate a virtual environment.
 3. Install dependencies.
-4. Run migrations.
-5. Create admin user.
-6. Run server.
+4. Set required environment variables.
+5. Run migrations and start the server.
 
 ### Windows PowerShell
 
 ```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+```
+
+Create a .env file in the project root:
+
+```env
+DEBUG=True
+SECRET_KEY=change-this-in-production
+ALLOWED_HOSTS=127.0.0.1,localhost
+CSRF_TRUSTED_ORIGINS=
+DATABASE_URL=postgres://USER:PASSWORD@HOST:PORT/DBNAME
+```
+
+Run the app:
+
+```powershell
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Open:
-- `http://127.0.0.1:8000/`
+Open: http://127.0.0.1:8000/
 
 ## Environment Variables
 
-Copy `.env.example` and set values in your environment.
+Required:
 
-Required in production:
-- `DEBUG=False`
-- `SECRET_KEY=<strong-secret>`
-- `ALLOWED_HOSTS=<your-domain,localhost,127.0.0.1>`
-- `CSRF_TRUSTED_ORIGINS=https://<your-domain>`
-- `DATABASE_URL=<render-postgres-external-url>`
+- SECRET_KEY
+- DATABASE_URL
 
-Optional:
-- `DB_CONN_MAX_AGE=600`
-- `CACHE_TIMEOUT=300`
-- `GOOGLE_CLIENT_ID=<google-oauth-client-id>`
-- `GOOGLE_CLIENT_SECRET=<google-oauth-client-secret>`
-- `SECURE_HSTS_SECONDS=31536000`
+Recommended:
 
-## Database Configuration
-
-The app uses PostgreSQL only.
-`DATABASE_URL` is required in all environments.
-
-Quick check command:
-
-```powershell
-python -c "import os,django; os.environ.setdefault('DJANGO_SETTINGS_MODULE','config.settings'); django.setup(); from django.conf import settings; print(settings.DATABASES['default']['ENGINE'])"
-```
-
-Expected output:
-- `django.db.backends.postgresql`
+- DEBUG (True/False)
+- ALLOWED_HOSTS (comma-separated)
+- CSRF_TRUSTED_ORIGINS (comma-separated full origins)
+- DB_CONN_MAX_AGE (default: 600)
+- CACHE_TIMEOUT (default: 300)
+- GOOGLE_CLIENT_ID
+- GOOGLE_CLIENT_SECRET
+- SECURE_HSTS_SECONDS (default: 31536000)
 
 ## Google Login Setup
 
-1. In Google Cloud Console, create OAuth credentials.
-2. Add authorized redirect URI:
-   - `http://localhost:8000/accounts/google/login/callback/` (local)
-   - `https://<your-render-domain>/accounts/google/login/callback/` (production)
-3. Set environment vars:
-   - `GOOGLE_CLIENT_ID`
-   - `GOOGLE_CLIENT_SECRET`
-4. In Django admin:
-   - Ensure `Site` domain matches your environment
-   - Ensure Google SocialApp exists and is linked to that Site
+1. Create OAuth credentials in Google Cloud Console.
+2. Add redirect URIs:
+   - http://localhost:8000/accounts/google/login/callback/
+   - https://attendly-77r3.onrender.com/accounts/google/login/callback/
+3. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.
+4. In Django admin, verify:
+   - Site domain is correct for your environment.
+   - A Google SocialApp is linked to that Site.
 
-## Caching
+## Deployment (Render)
 
-- Configured via Django cache framework in settings.
-- Default cache backend: `LocMemCache`.
-- Cached areas include dashboard and report reads.
-- Relevant write actions invalidate related cache keys.
+This project includes production deployment files:
 
-## Render Deployment
+- render.yaml
+- Procfile
+- runtime.txt
 
-This repository includes:
-- `render.yaml`
-- `Procfile`
-- `runtime.txt`
+Standard flow:
 
-Render build command:
-- Install dependencies
-- Collect static files
-- Run migrations
+1. Push this repository to GitHub.
+2. Create a Render Web Service from the repo.
+3. Attach a PostgreSQL database.
+4. Set environment variables on Render.
+5. Deploy and run migrations.
 
-Render start command:
-- `gunicorn config.wsgi:application --log-file -`
+Start command:
 
-### Deploy Steps
-
-1. Push repo to GitHub.
-2. Create a new Web Service on Render.
-3. Connect repo and use existing `render.yaml`.
-4. Create/attach PostgreSQL on Render.
-5. Set `DATABASE_URL` in Render environment.
-6. Confirm `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` match your Render domain.
-7. Deploy.
-
-## Security Notes
-
-Production security settings are enabled when `DEBUG=False`:
-- SSL redirect
-- Secure cookies
-- HSTS
-- X-Frame-Options DENY
-- Content type sniff protection
-
-Do not commit real secrets or database URLs to source control.
+```bash
+gunicorn config.wsgi:application --log-file -
+```
 
 ## Useful Commands
 
@@ -169,20 +136,8 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 ```
 
-## Troubleshooting
+## Security Notes
 
-### 1) Google login `redirect_uri_mismatch`
-- Ensure callback URI in Google Cloud exactly matches app callback.
+When DEBUG=False, the app enables security-focused settings such as HTTPS redirect, secure cookies, HSTS, and protective headers. Never commit real secrets to source control.
 
-### 2) Login error about missing username field
-- Confirm custom user model is configured with email login and allauth settings.
-
-### 3) App still using SQLite in production
-- Check `DATABASE_URL` is set in environment.
-
-### 4) Static files not loading on Render
-- Ensure `collectstatic` runs during build and WhiteNoise dependency is installed.
-
-## License
-
-Internal project / personal use unless you add your own license.
+## create with ❤️ by vik
