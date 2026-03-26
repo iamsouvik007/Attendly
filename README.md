@@ -139,7 +139,5 @@ python manage.py collectstatic --noinput
 ## Security Notes
 
 When DEBUG=False, the app enables security-focused settings such as HTTPS redirect, secure cookies, HSTS, and protective headers. Never commit real secrets to source control.
-<p align="center">
-  <hr>
-  Created with ❤️ by Vik
-</p>
+
+##------------------------------------------------------------------------------  Created with ❤️ by Vik ------------------------------------------------------------------------------
