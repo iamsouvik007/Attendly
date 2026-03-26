@@ -10,28 +10,56 @@ from .forms import TeacherRegisterForm
 
 
 def is_google_login_enabled(request):
-    env_configured = bool(
-        getattr(settings, 'GOOGLE_CLIENT_ID', '')
-        and getattr(settings, 'GOOGLE_CLIENT_SECRET', '')
-    )
+    return 'allauth.socialaccount.providers.google' in getattr(settings, 'INSTALLED_APPS', [])
 
-    socialapp_configured = False
-    try:
-        current_site = get_current_site(request)
-        socialapp_qs = SocialApp.objects.filter(
-            provider='google', sites=current_site)
-        if socialapp_qs.exists():
-            socialapp_configured = True
-        else:
-            # If a Google SocialApp exists but has no site attached, attach current site.
-            app = SocialApp.objects.filter(provider='google').first()
-            if app is not None:
-                app.sites.add(current_site)
-                socialapp_configured = True
-    except Exception:
-        socialapp_configured = False
 
-    return env_configured or socialapp_configured
+def ensure_google_social_app(request):
+    """Ensure Google SocialApp exists and is linked to the current Site when env creds are available."""
+    if not is_google_login_enabled(request):
+        return False
+
+    client_id = (getattr(settings, 'GOOGLE_CLIENT_ID', '') or '').strip()
+    client_secret = (
+        getattr(settings, 'GOOGLE_CLIENT_SECRET', '') or '').strip()
+    if not (client_id and client_secret):
+        return False
+
+    current_site = get_current_site(request)
+    app = SocialApp.objects.filter(
+        provider='google', client_id=client_id).first()
+    if app is None:
+        app = SocialApp.objects.create(
+            provider='google',
+            name='Google',
+            client_id=client_id,
+            secret=client_secret,
+            key='',
+        )
+    elif app.secret != client_secret:
+        app.secret = client_secret
+        app.save(update_fields=['secret'])
+
+    if not app.sites.filter(pk=current_site.pk).exists():
+        app.sites.add(current_site)
+
+    return True
+
+
+class GoogleStartView(View):
+    def get(self, request):
+        try:
+            configured = ensure_google_social_app(request)
+        except Exception:
+            configured = False
+
+        if not configured:
+            messages.error(
+                request,
+                'Google login is not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.',
+            )
+            return redirect('accounts:login')
+
+        return redirect('/accounts/google/login/')
 
 
 class TeacherLoginView(LoginView):
@@ -47,7 +75,7 @@ class RootRedirectView(View):
     def get(self, request):
         if request.user.is_authenticated:
             return redirect('dashboard:home')
-        return redirect('accounts:login')
+        return render(request, 'landing.html')
 
 
 class RegisterView(View):

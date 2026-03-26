@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.conf import settings
+from django.core.validators import MinLengthValidator, RegexValidator
 
 
 class Class(models.Model):
@@ -26,8 +27,14 @@ class Class(models.Model):
 class Student(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    student_id = models.CharField(max_length=20, unique=True)  # roll number
-    phone = models.CharField(max_length=20, blank=True)
+    student_id = models.CharField(max_length=20)  # roll number
+    phone = models.CharField(
+        max_length=20,
+        validators=[
+            MinLengthValidator(10),
+            RegexValidator(r'^\d+$', 'Mobile No must contain digits only.'),
+        ],
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

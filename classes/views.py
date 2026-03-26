@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic import ListView
@@ -26,6 +27,7 @@ class ClassCreateView(LoginRequiredMixin, View):
             cls = form.save(commit=False)
             cls.teacher = request.user
             cls.save()
+            cache.delete(f'dashboard_stats:{request.user.pk}')
             messages.success(request, 'Class created!')
             return redirect('classes:detail', pk=cls.pk)
         return render(request, 'classes/form.html', {'form': form})
@@ -45,28 +47,43 @@ class ClassDetailView(LoginRequiredMixin, View):
 
 class AddStudentView(LoginRequiredMixin, View):
 
+    def _invalidate_related_cache(self, teacher_pk, class_pk, student_pk):
+        cache.delete(f'dashboard_stats:{teacher_pk}')
+        cache.delete(f'class_report:{teacher_pk}:{class_pk}')
+        cache.delete(f'student_report:{teacher_pk}:{student_pk}')
+
+    def _render_class_detail(self, request, cls, student_form):
+        enrollments = cls.enrollments.select_related('student')
+        return render(request, 'classes/detail.html', {
+            'class': cls,
+            'enrollments': enrollments,
+            'student_form': student_form,
+        })
+
     def post(self, request, pk):
         cls = get_object_or_404(Class, pk=pk, teacher=request.user)
 
         form = StudentForm(request.POST)
-        if form.is_valid():
-            student, created = Student.objects.get_or_create(
-                student_id=form.cleaned_data['student_id'],
-                defaults={
-                    'first_name': form.cleaned_data['first_name'],
-                    'last_name': form.cleaned_data['last_name'],
-                    'phone': form.cleaned_data['phone'],
-                }
-            )
+        if not form.is_valid():
+            messages.error(
+                request, 'Please fill all fields correctly. Mobile No must be at least 10 digits.')
+            return self._render_class_detail(request, cls, form)
 
-            enrollment, created = Enrollment.objects.get_or_create(
-                student=student,
-                class_enrolled=cls
-            )
+        roll_no = form.cleaned_data['student_id']
+        duplicate_in_class = Enrollment.objects.filter(
+            class_enrolled=cls,
+            student__student_id=roll_no,
+        ).exists()
 
-            if created:
-                messages.success(request, f'{student} added.')
-            else:
-                messages.warning(request, 'Already enrolled.')
+        if duplicate_in_class:
+            form.add_error(
+                'student_id', 'This Roll No is already added in this class.')
+            messages.warning(
+                request, 'This Roll No is already added in this class.')
+            return self._render_class_detail(request, cls, form)
 
+        student = form.save()
+        Enrollment.objects.create(student=student, class_enrolled=cls)
+        self._invalidate_related_cache(request.user.pk, cls.pk, student.pk)
+        messages.success(request, f'{student} added.')
         return redirect('classes:detail', pk=pk)

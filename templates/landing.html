@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendly — Smart Attendance Tracking</title>
+    <meta name="description" content="Attendly makes attendance tracking effortless for modern educators. Create classes, mark attendance, and generate reports in seconds.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+
+<!-- Hero Section -->
+<section class="landing-hero">
+    <nav class="landing-nav">
+        <a href="/" class="brand">Attendly</a>
+        <div class="landing-nav-actions">
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline">Sign In</a>
+            <a href="{% url 'accounts:register' %}" class="btn">Get Started</a>
+        </div>
+    </nav>
+
+    <div class="landing-hero-content">
+        <h1 class="landing-headline">
+            Attendance tracking<br>
+            <span class="landing-headline-accent">made effortless.</span>
+        </h1>
+        <p class="landing-subheadline">
+            Create classes, mark attendance, and generate insightful reports — all from one clean dashboard. Built for teachers who value their time.
+        </p>
+        <div class="landing-cta-group">
+            <a href="{% url 'accounts:register' %}" class="btn btn-lg">Start Free →</a>
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline btn-lg">I have an account</a>
+        </div>
+    </div>
+
+    <div class="landing-hero-visual">
+        <div class="landing-mock-dashboard">
+            <div class="mock-nav-bar">
+                <span class="mock-brand">Attendly</span>
+                <div class="mock-nav-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+            <div class="mock-kpi-row">
+                <div class="mock-kpi-card">
+                    <span class="mock-kpi-num">24</span>
+                    <span class="mock-kpi-label">Students</span>
+                </div>
+                <div class="mock-kpi-card">
+                    <span class="mock-kpi-num">96%</span>
+                    <span class="mock-kpi-label">Attendance</span>
+                </div>
+                <div class="mock-kpi-card">
+                    <span class="mock-kpi-num">12</span>
+                    <span class="mock-kpi-label">Sessions</span>
+                </div>
+            </div>
+            <div class="mock-table">
+                <div class="mock-table-row mock-table-header">
+                    <span>Student</span><span>Status</span>
+                </div>
+                <div class="mock-table-row"><span>Aarav Patel</span><span class="mock-badge mock-present">Present</span></div>
+                <div class="mock-table-row"><span>Priya Sharma</span><span class="mock-badge mock-present">Present</span></div>
+                <div class="mock-table-row"><span>Rahul Verma</span><span class="mock-badge mock-late">Late</span></div>
+                <div class="mock-table-row"><span>Ananya Singh</span><span class="mock-badge mock-present">Present</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="landing-features">
+    <div class="landing-container">
+        <h2 class="landing-section-title">Everything you need, nothing you don't</h2>
+        <p class="landing-section-sub">Simple tools that actually save you time every day.</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <h3>Class Management</h3>
+                <p>Create classes, add students, and organize everything in one place. No spreadsheets needed.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                </div>
+                <h3>One-Tap Attendance</h3>
+                <p>Mark attendance for your entire class in under a minute. Present, absent, or late — done.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                        <line x1="2" y1="20" x2="22" y2="20"/>
+                    </svg>
+                </div>
+                <h3>Instant Reports</h3>
+                <p>See attendance percentages per student and per class. Spot trends before they become problems.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="landing-bottom-cta">
+    <div class="landing-container">
+        <h2>Ready to simplify your workflow?</h2>
+        <p>Join teachers who have traded messy registers for a clean, fast dashboard.</p>
+        <a href="{% url 'accounts:register' %}" class="btn btn-lg">Create Your Free Account</a>
+    </div>
+</section>
+
+<footer class="site-footer">
+    Attendly &copy; 2026 — Smart Attendance Tracking
+</footer>
+
+</body>
+</html>

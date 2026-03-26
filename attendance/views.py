@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views import View
@@ -41,6 +42,9 @@ class StartSessionView(LoginRequiredMixin, View):
                 for e in enrollments
             ])
 
+            cache.delete(f'dashboard_stats:{request.user.pk}')
+            cache.delete(f'class_report:{request.user.pk}:{cls.pk}')
+
         return redirect('attendance:mark', session_pk=session.pk)
 
 
@@ -76,6 +80,12 @@ class MarkAttendanceView(LoginRequiredMixin, View):
             record.status = status
             record.note = note
             record.save()
+
+            cache.delete(
+                f'student_report:{request.user.pk}:{record.student.pk}')
+
+        cache.delete(f'dashboard_stats:{request.user.pk}')
+        cache.delete(f'class_report:{request.user.pk}:{session.class_ref.pk}')
 
         messages.success(request, 'Attendance saved!')
         return redirect('attendance:mark', session_pk=session.pk)
