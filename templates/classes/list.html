@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Classes{% endblock %}
+
+{% block content %}
+<section class="card">
+    <div class="panel-head">
+        <div>
+            <h2 class="section-title">Classes</h2>
+            <p class="section-subtitle">Manage your classes and open details in one click.</p>
+        </div>
+        <a class="btn" href="{% url 'classes:create' %}">Create New Class</a>
+    </div>
+
+    {% if classes %}
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Code</th>
+                <th>Year</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cls in classes %}
+            <tr>
+                <td>{{ cls.name }}</td>
+                <td>{{ cls.code }}</td>
+                <td>{{ cls.year }}</td>
+                <td><a class="btn btn-outline" href="{% url 'classes:detail' cls.pk %}">Manage</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <p class="muted">No classes available. Create one to begin.</p>
+    {% endif %}
+</section>
+{% endblock %}

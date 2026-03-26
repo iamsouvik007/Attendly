@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Student Report{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 14px;">
+    <h2 class="section-title">{{ student }}</h2>
+    <p class="section-subtitle">Attendance summary</p>
+</div>
+
+<section class="grid grid-3" style="margin-bottom: 14px;">
+    <article class="card">
+        <p class="kpi">{{ total }}</p>
+        <p class="kpi-label">Total Sessions</p>
+    </article>
+    <article class="card">
+        <p class="kpi">{{ present }}</p>
+        <p class="kpi-label">Present</p>
+    </article>
+    <article class="card">
+        <p class="kpi">{{ percentage }}%</p>
+        <p class="kpi-label">Attendance Rate</p>
+    </article>
+</section>
+
+<div class="card">
+    <p>Absent: {{ absent }}</p>
+    <p>Late: {{ late }}</p>
+    <div class="actions">
+        <a href="{% url 'classes:list' %}" class="btn btn-outline">Back to Classes</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "accounts/base.html" %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<p class="brand-mini">ATTENDLY</p>
+<h2>Create Account</h2>
+<p class="subtitle">Simple setup for fast attendance management.</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    {{ form.non_field_errors }}
+
+    <label>Email</label>
+    {{ form.email }}
+    {{ form.email.errors }}
+
+    <label>First Name</label>
+    {{ form.first_name }}
+    {{ form.first_name.errors }}
+
+    <label>Last Name</label>
+    {{ form.last_name }}
+    {{ form.last_name.errors }}
+
+    <label>Password</label>
+    {{ form.password1 }}
+    {{ form.password1.errors }}
+
+    <label>Confirm Password</label>
+    {{ form.password2 }}
+    {{ form.password2.errors }}
+
+    <button type="submit">Register</button>
+</form>
+
+{% if google_login_enabled %}
+{% load socialaccount %}
+<div class="divider">or</div>
+<form action="{% provider_login_url 'google' %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class="google-btn">Sign up with Google</button>
+</form>
+{% else %}
+<p class="muted">Google signup is not configured yet. Add credentials in env or Django SocialApp.</p>
+{% endif %}
+
+<div class="link">
+    <p>Already have an account?</p>
+    <a href="{% url 'accounts:login' %}">Login</a>
+</div>
+{% endblock %}

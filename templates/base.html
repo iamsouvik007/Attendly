@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendly | {% block title %}{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<header class="site-nav">
+    <div class="site-nav-inner">
+        <a href="{% url 'dashboard:home' %}" class="brand">ATTENDLY</a>
+        <nav class="nav-links">
+            <button type="button" id="theme-toggle" class="btn btn-outline">Dark mode</button>
+            {% if request.user.is_authenticated %}
+            <a href="{% url 'dashboard:home' %}">Dashboard</a>
+            <a href="{% url 'classes:list' %}">Classes</a>
+            <a href="{% url 'classes:create' %}">New Class</a>
+            <form action="{% url 'accounts:logout' %}" method="post" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" style="padding: 8px 12px;">Logout</button>
+            </form>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+<main class="container">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+<script>
+    (function() {
+        var key = 'attendly-theme';
+        var button = document.getElementById('theme-toggle');
+        var saved = localStorage.getItem(key);
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var isDark = saved ? saved === 'dark' : prefersDark;
+
+        function setTheme(dark) {
+            document.body.classList.toggle('dark', dark);
+            button.textContent = dark ? 'Light mode' : 'Dark mode';
+        }
+
+        setTheme(isDark);
+
+        button.addEventListener('click', function() {
+            isDark = !document.body.classList.contains('dark');
+            setTheme(isDark);
+            localStorage.setItem(key, isDark ? 'dark' : 'light');
+        });
+    })();
+</script>
+</body>
+</html>

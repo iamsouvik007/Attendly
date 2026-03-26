@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Mark Attendance{% endblock %}
+
+{% block content %}
+<section class="card">
+    <div class="panel-head">
+        <div>
+            <h2 class="section-title">Mark Attendance</h2>
+            <p class="section-subtitle">{{ session.class_ref.name }} | {{ session.date }}</p>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Status</th>
+                    <th>Note</th>
+                    <th>Report</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.student }}</td>
+                    <td>
+                        <select name="status_{{ record.pk }}">
+                            <option value="present" {% if record.status == 'present' %}selected{% endif %}>Present</option>
+                            <option value="absent" {% if record.status == 'absent' %}selected{% endif %}>Absent</option>
+                            <option value="late" {% if record.status == 'late' %}selected{% endif %}>Late</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="note_{{ record.pk }}" value="{{ record.note }}" placeholder="Optional note">
+                    </td>
+                    <td>
+                        <a class="btn btn-outline" href="{% url 'reports:student_report' record.student.pk %}">Student Report</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <div class="actions" style="margin-top: 12px;">
+            <button class="btn" type="submit">Save Attendance</button>
+            <a class="btn btn-outline" href="{% url 'dashboard:home' %}">Back to Dashboard</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

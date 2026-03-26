@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="grid grid-3">
+    <article class="card">
+        <p class="kpi">{{ total_classes }}</p>
+        <p class="kpi-label">Total Classes</p>
+    </article>
+    <article class="card">
+        <p class="kpi">{{ recent_sessions|length }}</p>
+        <p class="kpi-label">Recent Sessions</p>
+    </article>
+    <article class="card">
+        <p class="kpi">{{ my_classes|length }}</p>
+        <p class="kpi-label">Active Classes</p>
+    </article>
+</section>
+
+<section class="card" style="margin-top: 14px;">
+    <div class="panel-head">
+        <div>
+            <h2 class="section-title">Your Classes</h2>
+            <p class="section-subtitle">Quickly open a class, mark attendance, or review reports.</p>
+        </div>
+        <div class="actions">
+        <a href="{% url 'classes:create' %}" class="btn">Create Class</a>
+        <a href="{% url 'classes:list' %}" class="btn btn-outline">View All Classes</a>
+        </div>
+    </div>
+
+    {% if my_classes %}
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Code</th>
+                <th>Year</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cls in my_classes %}
+            <tr>
+                <td>{{ cls.name }}</td>
+                <td>{{ cls.code }}</td>
+                <td>{{ cls.year }}</td>
+                <td class="actions">
+                    <a class="btn btn-outline" href="{% url 'classes:detail' cls.pk %}">Open</a>
+                    <a class="btn" href="{% url 'attendance:start' cls.pk %}">Take Attendance</a>
+                    <a class="btn btn-outline" href="{% url 'reports:class_report' cls.pk %}">Report</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <p class="muted">No classes yet. Create your first class to start tracking attendance.</p>
+    {% endif %}
+</section>
+{% endblock %}

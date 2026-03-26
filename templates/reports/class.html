@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Class Report{% endblock %}
+
+{% block content %}
+<section class="card" style="margin-bottom: 14px;">
+    <h2 class="section-title">{{ class.name }} - Attendance Report</h2>
+    <p class="section-subtitle">Code {{ class.code }} | Year {{ class.year }}</p>
+    <div class="actions">
+        <a class="btn btn-outline" href="{% url 'classes:detail' class.pk %}">Back to Class</a>
+    </div>
+</section>
+
+<section class="card">
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Total Sessions</th>
+                <th>Present</th>
+                <th>Attendance %</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in report_data %}
+            <tr>
+                <td>{{ row.student }}</td>
+                <td>{{ row.total }}</td>
+                <td>{{ row.present }}</td>
+                <td>{{ row.percentage }}%</td>
+                <td><a class="btn btn-outline" href="{% url 'reports:student_report' row.student.pk %}">Details</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No attendance data yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</section>
+{% endblock %}

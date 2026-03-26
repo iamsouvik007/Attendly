@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Class{% endblock %}
+
+{% block content %}
+<section class="card" style="max-width: 700px; margin: 0 auto;">
+    <h2 class="section-title">Create Class</h2>
+    <p class="section-subtitle">Set up a class in a few quick steps.</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="actions">
+            <button type="submit" class="btn">Save Class</button>
+            <a href="{% url 'classes:list' %}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}
