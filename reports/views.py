@@ -45,6 +45,7 @@ class ClassReportView(LoginRequiredMixin, View):
 
     def get(self, request, class_pk):
         cls = get_object_or_404(Class, pk=class_pk, teacher=request.user)
+        sessions = cls.sessions.order_by('-date')
         cache_key = f'class_report:{request.user.pk}:{class_pk}'
         report_data = cache.get(cache_key)
 
@@ -75,5 +76,6 @@ class ClassReportView(LoginRequiredMixin, View):
 
         return render(request, 'reports/class.html', {
             'class': cls,
-            'report_data': report_data
+            'report_data': report_data,
+            'sessions': sessions,
         })

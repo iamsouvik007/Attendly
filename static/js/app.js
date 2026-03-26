@@ -110,4 +110,71 @@
         });
     });
 
+    /* ---------- Custom confirm dialog for destructive forms ---------- */
+    var confirmModal = document.getElementById('confirm-modal');
+    var confirmMessage = document.getElementById('confirm-modal-message');
+    var confirmOk = document.getElementById('confirm-modal-ok');
+    var confirmCancel = document.getElementById('confirm-modal-cancel');
+    var pendingForm = null;
+
+    if (confirmModal && confirmMessage && confirmOk && confirmCancel) {
+        var openConfirm = function (form) {
+            pendingForm = form;
+            confirmMessage.textContent = form.getAttribute('data-confirm-message') || 'Are you sure?';
+            confirmModal.classList.add('is-open');
+            document.body.classList.add('modal-open');
+        };
+
+        var closeConfirm = function () {
+            confirmModal.classList.remove('is-open');
+            document.body.classList.remove('modal-open');
+            pendingForm = null;
+        };
+
+        document.addEventListener('submit', function (event) {
+            var form = event.target;
+            if (!(form instanceof HTMLFormElement)) {
+                return;
+            }
+
+            if (!form.hasAttribute('data-confirm-message')) {
+                return;
+            }
+
+            if (form.dataset.confirmed === 'true') {
+                form.dataset.confirmed = 'false';
+                return;
+            }
+
+            event.preventDefault();
+            openConfirm(form);
+        });
+
+        confirmOk.addEventListener('click', function () {
+            if (!pendingForm) {
+                closeConfirm();
+                return;
+            }
+
+            pendingForm.dataset.confirmed = 'true';
+            var formToSubmit = pendingForm;
+            closeConfirm();
+            formToSubmit.submit();
+        });
+
+        confirmCancel.addEventListener('click', closeConfirm);
+
+        confirmModal.addEventListener('click', function (event) {
+            if (event.target === confirmModal) {
+                closeConfirm();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && confirmModal.classList.contains('is-open')) {
+                closeConfirm();
+            }
+        });
+    }
+
 })();

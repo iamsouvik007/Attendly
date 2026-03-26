@@ -1,14 +1,28 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q
 from django.core.cache import cache
+from django.shortcuts import redirect
 from django.utils import timezone
 from django.views.generic import TemplateView
 from classes.models import Class, Enrollment
 from attendance.models import AttendanceSession
+from accounts.models import TeacherProfile
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/home.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        profile, _ = TeacherProfile.objects.get_or_create(
+            teacher=request.user,
+            defaults={
+                'full_name': f'{request.user.first_name} {request.user.last_name}'.strip(),
+                'mobile_no': (request.user.phone or '').strip(),
+            },
+        )
+        if not profile.is_complete:
+            return redirect('accounts:profile')
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -70,5 +84,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context.update(cached_context)
         context['selected_date'] = selected_date
         context['chart_rows'] = chart_rows
+        profile = getattr(teacher, 'profile', None)
+        if profile and profile.full_name.strip():
+            context['welcome_name'] = profile.full_name.strip().split()[0]
+        elif teacher.first_name.strip():
+            context['welcome_name'] = teacher.first_name.strip().split()[0]
+        else:
+            context['welcome_name'] = teacher.email
 
         return context

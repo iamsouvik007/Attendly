@@ -13,6 +13,18 @@
 
     <form method="post">
         {% csrf_token %}
+        <div class="attendance-toolbar">
+            <input
+                type="text"
+                id="studentSearch"
+                placeholder="Search by roll, name, or phone"
+                aria-label="Search student"
+            >
+            <div class="actions">
+                <button type="button" class="btn btn-success" id="setAllPresent">Select All Present</button>
+                <button type="button" class="btn btn-danger" id="setAllAbsent">Select All Absent</button>
+            </div>
+        </div>
         <div class="table-wrap">
         <table>
             <thead>
@@ -25,14 +37,32 @@
             </thead>
             <tbody>
                 {% for record in records %}
-                <tr>
-                    <td>{{ record.student }}</td>
+                <tr class="attendance-row" data-search="{{ record.student.first_name|lower }} {{ record.student.last_name|lower }} {{ record.student.student_id|lower }} {{ record.student.phone|default:''|lower }}">
                     <td>
-                        <select name="status_{{ record.pk }}">
-                            <option value="present" {% if record.status == 'present' %}selected{% endif %}>Present</option>
-                            <option value="absent" {% if record.status == 'absent' %}selected{% endif %}>Absent</option>
-                            <option value="late" {% if record.status == 'late' %}selected{% endif %}>Late</option>
-                        </select>
+                        <strong>{{ record.student.first_name }} {{ record.student.last_name }}</strong>
+                        <br>
+                        <small class="muted">{{ record.student.student_id }} | {{ record.student.phone|default:'-' }}</small>
+                    </td>
+                    <td>
+                        <input type="hidden" name="status_{{ record.pk }}" value="{{ record.status }}" class="status-input">
+                        <div class="status-toggle">
+                            <button
+                                type="button"
+                                class="status-btn status-btn-present {% if record.status == 'present' %}is-active{% endif %}"
+                                data-status-target="status_{{ record.pk }}"
+                                data-status-value="present"
+                            >
+                                Present
+                            </button>
+                            <button
+                                type="button"
+                                class="status-btn status-btn-absent {% if record.status == 'absent' %}is-active{% endif %}"
+                                data-status-target="status_{{ record.pk }}"
+                                data-status-value="absent"
+                            >
+                                Absent
+                            </button>
+                        </div>
                     </td>
                     <td>
                         <input type="text" name="note_{{ record.pk }}" value="{{ record.note }}" placeholder="Optional note">
@@ -47,8 +77,72 @@
         </div>
         <div class="actions" style="margin-top: 12px;">
             <button class="btn" type="submit">Save Attendance</button>
+            <a class="btn btn-outline" href="{% url 'classes:detail' session.class_ref.pk %}">Class Details</a>
             <a class="btn btn-outline" href="{% url 'dashboard:home' %}">Back to Dashboard</a>
         </div>
     </form>
 </section>
+
+<script>
+    (function () {
+        var setStatus = function (button) {
+            var inputName = button.dataset.statusTarget;
+            var value = button.dataset.statusValue;
+            var hiddenInput = document.querySelector('input[name="' + inputName + '"]');
+            if (!hiddenInput) return;
+
+            hiddenInput.value = value;
+            var group = button.closest('.status-toggle');
+            if (!group) return;
+
+            group.querySelectorAll('.status-btn').forEach(function (item) {
+                item.classList.remove('is-active');
+            });
+            button.classList.add('is-active');
+        };
+
+        document.querySelectorAll('.status-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                setStatus(button);
+            });
+        });
+
+        var applyBulkStatus = function (value) {
+            document.querySelectorAll('.attendance-row').forEach(function (row) {
+                if (row.style.display === 'none') {
+                    return;
+                }
+
+                var btn = row.querySelector('.status-btn[data-status-value="' + value + '"]');
+                if (btn) {
+                    setStatus(btn);
+                }
+            });
+        };
+
+        var allPresentBtn = document.getElementById('setAllPresent');
+        var allAbsentBtn = document.getElementById('setAllAbsent');
+        if (allPresentBtn) {
+            allPresentBtn.addEventListener('click', function () {
+                applyBulkStatus('present');
+            });
+        }
+        if (allAbsentBtn) {
+            allAbsentBtn.addEventListener('click', function () {
+                applyBulkStatus('absent');
+            });
+        }
+
+        var searchInput = document.getElementById('studentSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                var term = searchInput.value.trim().toLowerCase();
+                document.querySelectorAll('.attendance-row').forEach(function (row) {
+                    var haystack = row.dataset.search || '';
+                    row.style.display = !term || haystack.indexOf(term) !== -1 ? '' : 'none';
+                });
+            });
+        }
+    })();
+</script>
 {% endblock %}

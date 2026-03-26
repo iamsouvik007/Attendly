@@ -8,10 +8,11 @@
     <p class="section-subtitle">Year {{ class.year }}</p>
     <div class="actions">
         <a href="{% url 'attendance:start' class.pk %}" class="btn">Take Attendance</a>
+        <a href="{% url 'classes:edit' class.pk %}" class="btn btn-outline">Edit Class</a>
         <button type="button" class="btn btn-outline" id="toggle-add-student">Add Student</button>
         <a href="{% url 'reports:class_report' class.pk %}" class="btn btn-outline">View Class Report</a>
         <a href="{% url 'classes:list' %}" class="btn btn-outline">Back to Classes</a>
-        <form method="post" action="{% url 'classes:delete' class.pk %}" onsubmit="return confirm('Delete this class and its attendance data?');">
+        <form method="post" action="{% url 'classes:delete' class.pk %}" data-confirm-message="Delete this class and its attendance data?">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Delete Class</button>
         </form>
@@ -29,8 +30,9 @@
                 <th>Name</th>
                 <th>Mobile No</th>
                 <th>Enrolled</th>
-                <th>Report</th>
-                <th>Delete</th>
+                <th class="table-col-center">Report</th>
+                <th class="table-col-center">Edit</th>
+                <th class="table-col-center">Delete</th>
             </tr>
         </thead>
         <tbody>
@@ -40,11 +42,14 @@
                 <td>{{ enrollment.student.first_name }} {{ enrollment.student.last_name }}</td>
                 <td>{{ enrollment.student.phone|default:'-' }}</td>
                 <td>{{ enrollment.enrolled_at|date:'Y-m-d' }}</td>
-                <td>
+                <td class="table-col-center table-action-cell">
                     <a class="btn btn-outline" href="{% url 'reports:student_report' enrollment.student.pk %}">Student Report</a>
                 </td>
-                <td>
-                    <form method="post" action="{% url 'classes:delete_student' class.pk enrollment.student.pk %}" onsubmit="return confirm('Delete this student?');">
+                <td class="table-col-center table-action-cell">
+                    <a class="btn btn-outline" href="{% url 'classes:edit_student' class.pk enrollment.student.pk %}">Edit Student</a>
+                </td>
+                <td class="table-col-center table-action-cell">
+                    <form method="post" action="{% url 'classes:delete_student' class.pk enrollment.student.pk %}" data-confirm-message="Delete this student?">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger">Delete Student</button>
                     </form>
@@ -59,26 +64,97 @@
     {% endif %}
 </section>
 
-<section class="card" style="max-width: 760px; display: none;" id="add-student-panel">
-    <h3>Add Student</h3>
-    <form method="post" action="{% url 'classes:add_student' class.pk %}">
-        {% csrf_token %}
-        {{ student_form.as_p }}
-        <button type="submit" class="btn">Add Student</button>
-    </form>
+<section class="card" style="margin-bottom: 14px;">
+    <h3>Attendance Sessions</h3>
+    {% if sessions %}
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Present / Total</th>
+                <th class="table-col-center">Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for session in sessions %}
+            <tr>
+                <td>{{ session.date }}</td>
+                <td>{{ session.present_count }} / {{ session.total_records }}</td>
+                <td class="table-col-center table-action-cell">
+                    <a class="btn btn-outline" href="{% url 'attendance:mark' session.pk %}">Edit Attendance</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <p class="muted">No attendance sessions yet. Use Take Attendance to start one.</p>
+    {% endif %}
 </section>
+
+<div class="modal-backdrop{% if student_form.errors %} is-open{% endif %}" id="student-modal" aria-hidden="true">
+    <section class="card modal-card" role="dialog" aria-modal="true" aria-labelledby="add-student-title">
+        <div class="panel-head" style="margin-bottom: 8px;">
+            <h3 id="add-student-title">Add Student</h3>
+            <button type="button" class="btn btn-outline" id="close-student-modal">Close</button>
+        </div>
+        <form method="post" action="{% url 'classes:add_student' class.pk %}">
+            {% csrf_token %}
+            {{ student_form.as_p }}
+            <div class="actions">
+                <button type="submit" class="btn">Add Student</button>
+                <button type="button" class="btn btn-outline" id="cancel-student-modal">Cancel</button>
+            </div>
+        </form>
+    </section>
+</div>
 
 <script>
     (function () {
-        const panel = document.getElementById('add-student-panel');
+        const modal = document.getElementById('student-modal');
         const btn = document.getElementById('toggle-add-student');
-        if (!panel || !btn) return;
+        const closeBtn = document.getElementById('close-student-modal');
+        const cancelBtn = document.getElementById('cancel-student-modal');
+        if (!modal || !btn) return;
+
+        const openModal = function () {
+            modal.classList.add('is-open');
+            document.body.classList.add('modal-open');
+        };
+
+        const closeModal = function () {
+            modal.classList.remove('is-open');
+            document.body.classList.remove('modal-open');
+        };
 
         btn.addEventListener('click', function () {
-            const hidden = panel.style.display === 'none' || panel.style.display === '';
-            panel.style.display = hidden ? 'block' : 'none';
-            btn.textContent = hidden ? 'Hide Add Student' : 'Add Student';
+            openModal();
         });
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeModal);
+        }
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', closeModal);
+        }
+
+        modal.addEventListener('click', function (event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+                closeModal();
+            }
+        });
+
+        if (modal.classList.contains('is-open')) {
+            document.body.classList.add('modal-open');
+        }
     })();
 </script>
 {% endblock %}

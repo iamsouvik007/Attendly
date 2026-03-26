@@ -318,6 +318,16 @@ button {
     color: #fff;
 }
 
+.btn-success {
+    background: var(--success);
+    color: #fff;
+}
+
+.btn-success:hover {
+    background: #21623c;
+    color: #fff;
+}
+
 /* ---------- Grid ---------- */
 .grid {
     display: grid;
@@ -418,6 +428,18 @@ td {
     font-size: .92rem;
 }
 
+.table-col-center {
+    text-align: center;
+}
+
+.table-action-cell .btn {
+    min-width: 132px;
+}
+
+.table-action-cell form {
+    margin: 0;
+}
+
 th {
     color: var(--ink-soft);
     background: var(--surface-alt);
@@ -454,6 +476,122 @@ tbody tr:hover {
     gap: 12px;
     margin-bottom: 16px;
     flex-wrap: wrap;
+}
+
+.modal-open {
+    overflow: hidden;
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(44, 41, 38, .45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 200;
+}
+
+.modal-backdrop.is-open {
+    display: flex;
+}
+
+.modal-card {
+    width: min(760px, 100%);
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+}
+
+.confirm-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(44, 41, 38, .45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 300;
+}
+
+.confirm-modal-backdrop.is-open {
+    display: flex;
+}
+
+.confirm-modal-card {
+    width: min(460px, 100%);
+}
+
+.attendance-toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.attendance-toolbar input {
+    margin: 0;
+    max-width: 340px;
+}
+
+.status-toggle {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.status-btn {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 8px 14px;
+    background: var(--surface);
+    color: var(--ink-soft);
+    font-size: .88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.status-btn-present {
+    border-color: #7db393;
+    color: #255f40;
+}
+
+.status-btn-absent {
+    border-color: #cc8f88;
+    color: #7a2f29;
+}
+
+.status-btn-present.is-active {
+    background: #2f8a56;
+    border-color: #2f8a56;
+    color: #fff;
+}
+
+.status-btn-absent.is-active {
+    background: #b63f33;
+    border-color: #b63f33;
+    color: #fff;
+}
+
+.status-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.dashboard-welcome {
+    margin: 4px 0 14px;
+}
+
+.dashboard-welcome-title {
+    margin: 0;
+    font-family: var(--font-brand);
+    font-size: clamp(2rem, 4.2vw, 2.8rem);
+    letter-spacing: .4px;
+    color: var(--accent);
+    line-height: 1.1;
 }
 
 /* ---------- Messages ---------- */

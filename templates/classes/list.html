@@ -29,12 +29,15 @@
                 <td>{{ cls.name }}</td>
                 <td>{{ cls.code }}</td>
                 <td>{{ cls.year }}</td>
-                <td class="actions">
-                    <a class="btn btn-outline" href="{% url 'classes:detail' cls.pk %}">Manage</a>
-                    <form method="post" action="{% url 'classes:delete' cls.pk %}" onsubmit="return confirm('Delete this class and all its attendance records?');">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
+                <td class="table-action-cell">
+                    <div class="actions">
+                        <a class="btn btn-outline" href="{% url 'classes:detail' cls.pk %}">Manage</a>
+                        <a class="btn btn-outline" href="{% url 'classes:edit' cls.pk %}">Edit</a>
+                        <form method="post" action="{% url 'classes:delete' cls.pk %}" data-confirm-message="Delete this class and all its attendance records?">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             {% endfor %}

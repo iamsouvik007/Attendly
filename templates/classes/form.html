@@ -1,17 +1,27 @@
 {% extends 'base.html' %}
 
-{% block title %}Create Class{% endblock %}
+{% block title %}{% if is_edit %}Edit Class{% else %}Create Class{% endif %}{% endblock %}
 
 {% block content %}
 <section class="card" style="max-width: 700px; margin: 0 auto;">
-    <h2 class="section-title">Create Class</h2>
-    <p class="section-subtitle">Set up a class in a few quick steps.</p>
+    <h2 class="section-title">{% if is_edit %}Edit Class{% else %}Create Class{% endif %}</h2>
+    <p class="section-subtitle">
+        {% if is_edit %}
+        Update class name, code, and year.
+        {% else %}
+        Set up a class in a few quick steps.
+        {% endif %}
+    </p>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <div class="actions">
-            <button type="submit" class="btn">Save Class</button>
+            <button type="submit" class="btn">{% if is_edit %}Update Class{% else %}Save Class{% endif %}</button>
+            {% if is_edit and class_obj %}
+            <a href="{% url 'classes:detail' class_obj.pk %}" class="btn btn-outline">Cancel</a>
+            {% else %}
             <a href="{% url 'classes:list' %}" class="btn btn-outline">Cancel</a>
+            {% endif %}
         </div>
     </form>
 </section>

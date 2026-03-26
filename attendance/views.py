@@ -72,9 +72,12 @@ class MarkAttendanceView(LoginRequiredMixin, View):
         )
 
         records = session.records.select_related('student')
+        allowed_statuses = {'present', 'absent', 'late'}
 
         for record in records:
             status = request.POST.get(f'status_{record.pk}', 'absent')
+            if status not in allowed_statuses:
+                status = 'absent'
             note = request.POST.get(f'note_{record.pk}', '')
 
             record.status = status

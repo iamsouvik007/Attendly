@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<section class="card" style="max-width: 760px; margin: 0 auto;">
+    <h2 class="section-title">{% if is_onboarding %}Complete Your Profile{% else %}Edit Profile{% endif %}</h2>
+    <p class="section-subtitle">
+        {% if is_onboarding %}
+        Please add your name and mobile number before continuing.
+        {% else %}
+        Update your personal profile information.
+        {% endif %}
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="actions">
+            <button type="submit" class="btn">Save Profile</button>
+            {% if not is_onboarding %}
+            <a href="{% url 'dashboard:home' %}" class="btn btn-outline">Back to Dashboard</a>
+            {% endif %}
+        </div>
+    </form>
+</section>
+{% endblock %}

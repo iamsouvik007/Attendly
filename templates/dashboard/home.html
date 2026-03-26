@@ -3,6 +3,10 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+<section class="dashboard-welcome">
+    <h1 class="dashboard-welcome-title">Welcome {{ welcome_name }}</h1>
+</section>
+
 <section class="grid grid-3">
     <article class="card">
         <p class="kpi">{{ total_classes }}</p>
@@ -93,10 +97,12 @@
                 <td>{{ cls.name }}</td>
                 <td>{{ cls.code }}</td>
                 <td>{{ cls.year }}</td>
-                <td class="actions">
-                    <a class="btn btn-outline" href="{% url 'classes:detail' cls.pk %}">Open</a>
-                    <a class="btn" href="{% url 'attendance:start' cls.pk %}">Take Attendance</a>
-                    <a class="btn btn-outline" href="{% url 'reports:class_report' cls.pk %}">Report</a>
+                <td class="table-action-cell">
+                    <div class="actions">
+                        <a class="btn btn-outline" href="{% url 'classes:detail' cls.pk %}">Open</a>
+                        <a class="btn" href="{% url 'attendance:start' cls.pk %}">Take Attendance</a>
+                        <a class="btn btn-outline" href="{% url 'reports:class_report' cls.pk %}">Report</a>
+                    </div>
                 </td>
             </tr>
             {% endfor %}

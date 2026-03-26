@@ -5,8 +5,10 @@ from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.contrib.sites.shortcuts import get_current_site
 from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
 from allauth.socialaccount.models import SocialApp
-from .forms import TeacherRegisterForm
+from .forms import TeacherRegisterForm, TeacherProfileForm
+from .models import TeacherProfile
 
 
 def is_google_login_enabled(request):
@@ -97,3 +99,45 @@ class RegisterView(View):
             'form': form,
             'google_login_enabled': is_google_login_enabled(request),
         })
+
+
+class ProfileView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        profile = self._get_profile(request.user)
+        form = TeacherProfileForm(instance=profile)
+        return render(request, 'accounts/profile.html', {
+            'form': form,
+            'is_onboarding': not profile.is_complete,
+        })
+
+    def post(self, request):
+        profile = self._get_profile(request.user)
+        form = TeacherProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            saved_profile = form.save()
+            self._sync_teacher_name_phone(request.user, saved_profile)
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('dashboard:home')
+
+        return render(request, 'accounts/profile.html', {
+            'form': form,
+            'is_onboarding': not profile.is_complete,
+        })
+
+    def _get_profile(self, teacher):
+        profile, _ = TeacherProfile.objects.get_or_create(
+            teacher=teacher,
+            defaults={
+                'full_name': f'{teacher.first_name} {teacher.last_name}'.strip(),
+                'mobile_no': (teacher.phone or '').strip(),
+            },
+        )
+        return profile
+
+    def _sync_teacher_name_phone(self, teacher, profile):
+        parts = profile.full_name.strip().split(maxsplit=1)
+        teacher.first_name = parts[0] if parts else ''
+        teacher.last_name = parts[1] if len(parts) > 1 else ''
+        teacher.phone = profile.mobile_no
+        teacher.save(update_fields=['first_name', 'last_name', 'phone'])
